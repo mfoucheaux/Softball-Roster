@@ -1,0 +1,26 @@
+{
+  "name": "Softball Lineup 2026",
+  "short_name": "Softball",
+  "description": "Softball lineup, rotation, and score tracker for coaches",
+  "start_url": "/Softball-Roster/index.html",
+  "scope": "/Softball-Roster/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#6A0DAD",
+  "theme_color": "#6A0DAD",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["sports", "utilities"]
+}
