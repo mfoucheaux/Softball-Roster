@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Softball">
+<meta name="theme-color" content="#6A0DAD">
+<meta name="description" content="Softball lineup, rotation, and score tracker for coaches">
+<link rel="manifest" href="manifest.json">
+<!-- Apple touch icons (inline fallback via JS) -->
+<title>Softball Lineup 2026</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#6A0DAD;--gold:#FFD700;--gold-light:#fff8dc;--gold-text:#633806;
+  --blue-light:#ddeeff;--blue-text:#0c447c;--gray-light:#f1efe8;--gray-text:#5f5e5a;
+  --red-light:#fcebeb;--red-text:#a32d2d;--green-light:#e8f5e9;--green-text:#2e7d32;
+  --bg:#ffffff;--bg2:#f8f8f8;--bg3:#f1f0ec;
+  --text:#1a1a1a;--text2:#555;--text3:#999;
+  --border:#e0e0e0;--border2:#ccc;
+  --radius:10px;--radius-sm:6px;
+  --nav-h:56px;--tab-h:58px;
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#1a1a1a;--bg2:#242424;--bg3:#2a2a2a;--text:#f0f0f0;--text2:#aaa;--text3:#666;--border:#333;--border2:#444;--gold-light:#3a2e00;--gold-text:#ffd700;--blue-light:#0a1f3a;--blue-text:#85b7eb;--gray-light:#2a2a2a;--gray-text:#aaa;--red-light:#2a0a0a;--red-text:#f09595;--green-light:#0a2a0a;--green-text:#81c784;}
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;padding-bottom:calc(var(--tab-h) + 8px)}
+
+/* ── Top header ── */
+.app-header{background:var(--purple);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.app-header h1{font-size:16px;font-weight:700;display:flex;align-items:center;gap:7px}
+.header-sub{font-size:11px;opacity:.75;font-weight:500}
+
+/* ── Bottom tab bar ── */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;height:var(--tab-h);background:var(--purple);border-top:none;display:flex;align-items:center;justify-content:space-around;z-index:200;box-shadow:0 -2px 12px rgba(0,0,0,.3);padding:0 8px;gap:6px}
+.tab-bar-btn{flex:1;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:5px;cursor:pointer;background:transparent;border:1.5px solid rgba(255,255,255,.45);border-radius:20px;color:rgba(255,255,255,.75);font-size:14px;font-weight:600;transition:all .18s;padding:8px 10px;position:relative;white-space:nowrap;min-width:0}
+.tab-bar-btn.active{background:rgba(255,255,255,.22);border-color:#fff;color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.25)}
+.tab-bar-btn:hover:not(.active){background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.65);color:#fff}
+.tab-bar-btn .absent-pip{position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:#ff6b6b;border:1.5px solid var(--purple);display:none}
+.tab-bar-btn.has-absent .absent-pip{display:block}
+
+/* ── Screens ── */
+.screen{display:none;padding:12px;max-width:860px;margin:0 auto}
+.screen.active{display:block}
+
+/* ── Cards / sections ── */
+.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px}
+.sec-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.divider{height:1px;background:var(--border);margin:10px 0}
+
+/* ── Roster ── */
+.player-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:420px){.player-grid{grid-template-columns:repeat(2,1fr)}}
+.player-input{display:flex;align-items:center;gap:6px}
+.pnum{font-size:11px;font-weight:600;color:var(--text3);min-width:16px;text-align:right}
+.player-input input{flex:1;font-size:13px;padding:6px 8px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);outline:none;width:100%}
+.player-input input:focus{border-color:var(--purple);box-shadow:0 0 0 2px rgba(106,13,173,.15)}
+
+/* ── Game selector pills ── */
+.game-pills{display:flex;gap:6px;flex-wrap:wrap}
+.game-pill{padding:7px 14px;font-size:13px;font-weight:500;border:0.5px solid var(--border2);border-radius:20px;cursor:pointer;background:var(--bg);color:var(--text2);transition:all .15s;position:relative}
+.game-pill.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+.game-pill .absent-dot{position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--red-text);display:none}
+.game-pill.has-absent .absent-dot{display:block}
+
+/* ── Absent ── */
+.absent-grid{display:flex;gap:6px;flex-wrap:wrap}
+.absent-btn{padding:5px 12px;font-size:12px;font-weight:500;border:0.5px solid var(--border2);border-radius:20px;cursor:pointer;background:var(--bg);color:var(--text2)}
+.absent-btn.out{background:var(--red-light);color:var(--red-text);border-color:var(--red-text)}
+.absent-note{font-size:11px;color:var(--red-text);margin-top:6px;display:flex;align-items:center;gap:4px}
+
+/* ── Rules bar ── */
+.rules-bar{display:flex;gap:8px;flex-wrap:wrap;padding:8px 12px;background:var(--green-light);border-radius:var(--radius-sm);margin-bottom:12px;font-size:11px;color:var(--green-text);font-weight:500}
+.rules-bar span{display:flex;align-items:center;gap:4px}
+.warn{background:var(--red-light);color:var(--red-text);border-radius:var(--radius-sm);padding:8px 12px;margin-bottom:10px;font-size:12px;display:flex;align-items:center;gap:6px}
+
+/* ── Game details card ── */
+.game-details-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+.game-details-header{background:var(--purple);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.game-details-header .title{font-size:13px;font-weight:700}
+.pdf-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;font-size:12px;font-weight:600;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:20px;cursor:pointer}
+.pdf-btn:hover{background:rgba(255,255,255,.28)}
+.game-details-body{display:grid;grid-template-columns:1fr auto}
+@media(max-width:560px){.game-details-body{grid-template-columns:1fr}}
+.field-wrap{padding:12px 14px;border-right:0.5px solid var(--border)}
+@media(max-width:560px){.field-wrap{border-right:none;border-bottom:0.5px solid var(--border)}}
+.field-table{width:100%;border-collapse:collapse;font-size:13px}
+.field-table th{font-size:11px;font-weight:600;color:var(--text2);padding:5px 6px;text-align:center;border-bottom:0.5px solid var(--border)}
+.field-table th:first-child{text-align:left;min-width:44px}
+.field-table td{padding:5px 6px;text-align:center;border-bottom:0.5px solid var(--border);font-size:12px}
+.field-table td:first-child{text-align:left}
+.field-table tr:last-child td{border-bottom:none}
+.pos-pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap}
+.pos-I{background:var(--gold-light);color:var(--gold-text)}
+.pos-O{background:var(--blue-light);color:var(--blue-text)}
+.pos-B{background:var(--gray-light);color:var(--gray-text)}
+.cell-vacant{font-size:11px;color:var(--text3);font-style:italic}
+.bat-wrap{padding:12px 14px;min-width:140px}
+.bat-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.bat-list{list-style:none}
+.bat-list li{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.bat-list li:last-child{border-bottom:none}
+.bat-num{font-size:11px;font-weight:700;color:var(--text3);min-width:16px;text-align:right}
+.bat-jersey{font-size:11px;font-weight:700;color:var(--purple);min-width:32px;text-align:right}
+.bat-name{font-weight:500}
+.jersey-input{width:38px;font-size:12px;font-weight:600;padding:6px 4px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--purple);outline:none;text-align:center;flex-shrink:0}
+.jersey-input:focus{border-color:var(--purple);box-shadow:0 0 0 2px rgba(106,13,173,.12)}
+.jersey-input::placeholder{color:var(--text3);font-weight:400}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.leg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)}
+.leg-dot{width:12px;height:12px;border-radius:3px}
+
+/* ── Scoreboard ── */
+.scoreboard{border-top:0.5px solid var(--border);padding:12px 14px 14px}
+.score-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.score-table{border-collapse:collapse;width:100%;font-size:13px}
+.score-table th{font-size:11px;font-weight:600;color:var(--text2);padding:6px 8px;text-align:center;border:0.5px solid var(--border);background:var(--bg2);white-space:nowrap}
+.score-table th.team-header{text-align:left;min-width:90px}
+.score-table td{padding:4px;border:0.5px solid var(--border);text-align:center;vertical-align:middle}
+.score-table td.team-label{padding:6px 8px;font-weight:600;font-size:12px;text-align:left;white-space:nowrap;background:var(--bg2)}
+.score-table td.team-label.us{color:var(--purple)}
+.score-input{width:36px;height:30px;text-align:center;font-size:14px;font-weight:600;border:none;background:transparent;color:var(--text);outline:none;cursor:pointer;border-radius:4px;-moz-appearance:textfield}
+.score-input::-webkit-inner-spin-button,.score-input::-webkit-outer-spin-button{-webkit-appearance:none}
+.score-input:hover{background:var(--bg3)}
+.score-input:focus{background:var(--gold-light);color:var(--gold-text)}
+.score-table td.total-cell{font-size:16px;font-weight:800;padding:6px 10px;min-width:48px;background:var(--bg2)}
+.score-table td.total-cell.us{color:var(--purple)}
+.score-table th.total-header{font-weight:700;color:var(--text)}
+.win-banner{display:none;margin-top:8px;padding:6px 12px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;text-align:center}
+.win-banner.win{display:block;background:var(--green-light);color:var(--green-text)}
+.win-banner.loss{display:block;background:var(--red-light);color:var(--red-text)}
+.win-banner.tie{display:block;background:var(--gold-light);color:var(--gold-text)}
+
+/* ── Tracker ── */
+.tracker-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--border)}
+.tracker-row:last-child{border-bottom:none}
+.tracker-row.absent-row{opacity:.45}
+.dots{display:flex;gap:3px}
+.dot{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.dot-I{background:var(--gold-light);color:var(--gold-text)}
+.dot-O{background:var(--blue-light);color:var(--blue-text)}
+.dot-B{background:var(--gray-light);color:var(--gray-text)}
+.dot-X{background:var(--red-light);color:var(--red-text)}
+.of-badge{font-size:11px;padding:2px 7px;border-radius:10px;font-weight:700}
+.of-1{background:var(--blue-light);color:var(--blue-text)}
+.of-2{background:var(--green-light);color:var(--green-text)}
+.of-abs{background:var(--red-light);color:var(--red-text)}
+
+/* ── Season summary ── */
+.summary-wrap{overflow-x:auto}
+.summary-table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+.summary-table th{font-size:11px;font-weight:600;color:var(--text2);padding:5px 7px;text-align:center;border-bottom:0.5px solid var(--border);background:var(--bg2)}
+.summary-table th:first-child{text-align:left}
+.summary-table td{padding:5px 7px;text-align:center;border-bottom:0.5px solid var(--border)}
+.summary-table td:first-child{text-align:left;font-weight:500}
+.summary-table tr:last-child td{border-bottom:none}
+.cnt-I{color:var(--gold-text);font-weight:600}
+.cnt-O{color:var(--blue-text);font-weight:600}
+
+/* ── Misc ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:500;border:0.5px solid var(--border2);border-radius:var(--radius-sm);cursor:pointer;background:var(--bg);color:var(--text)}
+.btn:hover{background:var(--bg2)}
+
+/* ── Print: only game details card ── */
+@media print{
+  @page{size:letter portrait;margin:18mm 14mm}
+  body{background:#fff!important;color:#000!important;padding-bottom:0}
+  .tab-bar,.app-header{display:none!important}
+  /* hide all screens, then show only the game details card inside screen-game */
+  .screen{display:none!important}
+  #screen-game{display:block!important}
+  /* hide everything in screen-game except printTarget */
+  #screen-game > *{display:none!important}
+  #screen-game > #printTarget{display:block!important}
+  .game-details-card{border:1.5pt solid #6A0DAD;border-radius:6pt;overflow:visible}
+  .game-details-header{background:#6A0DAD!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:8pt 12pt}
+  .pdf-btn{display:none!important}
+  .game-details-body{display:grid!important;grid-template-columns:1fr auto!important}
+  .field-wrap{border-right:0.5pt solid #ccc!important}
+  .pos-I{background:#fff8dc!important;color:#633806!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pos-O{background:#ddeeff!important;color:#0c447c!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .score-table th,.score-table td.team-label,.score-table td.total-cell{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .win-banner{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .print-footer{display:block!important;margin-top:8pt;font-size:8pt;color:#888;text-align:center}
+}
+.roster-name-input{flex:1;font-size:13px;padding:6px 8px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);outline:none;min-width:0}
+.roster-name-input:focus{border-color:var(--purple);box-shadow:0 0 0 2px rgba(106,13,173,.15)}
+.roster-jersey-input{width:42px;flex-shrink:0;font-size:13px;font-weight:600;padding:6px 6px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--purple);outline:none;text-align:center}
+.roster-jersey-input:focus{border-color:var(--purple);box-shadow:0 0 0 2px rgba(106,13,173,.15)}
+.roster-jersey-input::placeholder{color:var(--text3);font-weight:400}
+.bat-jersey{font-size:11px;font-weight:700;color:var(--purple);background:var(--gold-light);padding:2px 6px;border-radius:6px;min-width:32px;text-align:center;flex-shrink:0}
+.bat-jersey-empty{color:var(--text3);background:none;font-weight:400}
+.game-count-btn{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--purple);background:var(--bg);color:var(--purple);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:all .15s}
+.game-count-btn:hover{background:var(--purple);color:#fff}
+.game-count-btn:disabled{opacity:.3;cursor:default}
+.schedule-game-card{border:0.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:12px;overflow:hidden}
+.schedule-game-card:last-child{margin-bottom:0}
+.schedule-game-header{background:var(--bg2);padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:0.5px solid var(--border)}
+.schedule-game-num{font-size:12px;font-weight:700;color:var(--purple)}
+.schedule-date{font-size:12px;color:var(--text2);margin-left:auto}
+.schedule-ha{font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px}
+.schedule-ha-home{background:var(--green-light);color:var(--green-text)}
+.schedule-ha-away{background:var(--blue-light);color:var(--blue-text)}
+.schedule-time-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--gold-light);color:var(--gold-text)}
+.schedule-time-display{font-size:12px;font-weight:600;color:var(--purple);min-width:64px}
+.schedule-fields{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.schedule-field-row{display:flex;align-items:center;gap:10px}
+.schedule-field-row label{font-size:12px;font-weight:500;color:var(--text2);min-width:76px;flex-shrink:0}
+.schedule-input{flex:1;font-size:13px;padding:6px 8px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);outline:none}
+.schedule-input:focus{border-color:var(--purple);box-shadow:0 0 0 2px rgba(106,13,173,.12)}
+.schedule-input-sm{flex:0 0 80px;max-width:80px}
+.ha-toggle{display:flex;gap:6px}
+.ha-btn{padding:5px 14px;font-size:12px;font-weight:600;border:0.5px solid var(--border2);border-radius:20px;cursor:pointer;background:var(--bg);color:var(--text2);transition:all .15s}
+.ha-btn.active.home-btn,.ha-btn[data-val="home"].active{background:var(--green-light);color:var(--green-text);border-color:var(--green-text)}
+.ha-btn[data-val="away"].active{background:var(--blue-light);color:var(--blue-text);border-color:var(--blue-text)}
+.ha-btn:not(.active):hover{background:var(--bg2)}
+.print-footer{display:none}
+</style>
+</head>
+<body>
+
+<!-- Top header -->
+<header class="app-header">
+  <h1><i class="ti ti-ball-baseball" aria-hidden="true"></i> Softball Lineup 2026</h1>
+  <span class="header-sub" id="headerSub">Roster</span>
+</header>
+
+<!-- ═══════════════ SCREEN 1: ROSTER ═══════════════ -->
+<div class="screen active" id="screen-roster">
+  <div class="card">
+    <div class="sec-title"><i class="ti ti-users" aria-hidden="true"></i> Team Roster</div>
+    <div class="player-grid" id="rosterGrid"></div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text3)">Players 10–11 = OF Floaters &nbsp;·&nbsp; Player 12 = Bench rotation</div>
+  </div>
+  <div class="rules-bar">
+    <span><i class="ti ti-check" aria-hidden="true"></i> Max 2 outfield innings/game</span>
+    <span><i class="ti ti-check" aria-hidden="true"></i> Min 1 outfield inning per player</span>
+    <span><i class="ti ti-check" aria-hidden="true"></i> No back-to-back outfield innings</span>
+    <span><i class="ti ti-check" aria-hidden="true"></i> No position played more than 4× per season</span>
+  </div>
+
+</div>
+
+<!-- ═══════════════ SCREEN 2: GAME DETAILS ═══════════════ -->
+<div class="screen" id="screen-game">
+  <div class="card">
+    <div class="sec-title"><i class="ti ti-calendar-event" aria-hidden="true"></i> Select Game</div>
+    <div class="game-pills" id="gamePills"></div>
+    <div class="divider"></div>
+    <div class="sec-title" style="margin-bottom:8px"><i class="ti ti-user-x" aria-hidden="true"></i> Mark Absent — this game only</div>
+    <div class="absent-grid" id="absentGrid"></div>
+    <div id="absentNote"></div>
+  </div>
+
+  <div id="warnBox"></div>
+
+  <!-- Print target -->
+  <div id="printTarget">
+    <div class="game-details-card">
+      <div class="game-details-header">
+        <span class="title" id="detailsTitle">Game 1 Details</span>
+        <button class="pdf-btn" onclick="window.print()"><i class="ti ti-file-type-pdf" aria-hidden="true"></i> Save / Print PDF</button>
+      </div>
+      <div class="game-details-body">
+        <div class="field-wrap">
+          <table class="field-table" id="fieldTable"></table>
+          <div class="legend">
+            <div class="leg"><div class="leg-dot" style="background:var(--gold-light);border:1px solid #c9a227"></div>Infield</div>
+            <div class="leg"><div class="leg-dot" style="background:var(--blue-light);border:1px solid #378add"></div>Outfield</div>
+          </div>
+        </div>
+        <div class="bat-wrap">
+          <div class="bat-title"><i class="ti ti-list-numbers" aria-hidden="true"></i> Batting Order</div>
+          <ol class="bat-list" id="batList"></ol>
+        </div>
+      </div>
+      <div class="scoreboard">
+        <div class="score-title"><i class="ti ti-chart-bar" aria-hidden="true"></i> Score by Inning</div>
+        <div style="overflow-x:auto"><table class="score-table" id="scoreTable"></table></div>
+        <div class="win-banner" id="winBanner"></div>
+      </div>
+    </div>
+    <div class="print-footer" id="printFooter"></div>
+  </div>
+
+  <div style="margin-top:4px">
+    <button class="btn" onclick="copyLineup()"><i class="ti ti-clipboard" aria-hidden="true"></i> Copy lineup text</button>
+  </div>
+  <div style="height:8px"></div>
+</div>
+
+<!-- ═══════════════ SCREEN 3: INNING TRACKER ═══════════════ -->
+<div class="screen" id="screen-tracker">
+  <div class="card">
+    <div class="sec-title"><i class="ti ti-calendar-event" aria-hidden="true"></i> Select Game</div>
+    <div class="game-pills" id="trackerPills"></div>
+  </div>
+  <div class="card">
+    <div class="sec-title"><i class="ti ti-chart-grid-dots" aria-hidden="true"></i> Inning Tracker — <span id="trackerGameLabel">Game 1</span></div>
+    <div id="trackerDiv"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 4: SEASON SUMMARY ═══════════════ -->
+<div class="screen" id="screen-summary">
+  <div class="card">
+    <div class="sec-title"><i class="ti ti-chart-bar" aria-hidden="true"></i> Season Summary — All Games</div>
+    <div class="summary-wrap"><table class="summary-table" id="summaryTable"></table></div>
+  </div>
+  <div class="card">
+    <div class="sec-title"><i class="ti ti-info-circle" aria-hidden="true"></i> Legend</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.8">
+      <div><span class="cnt-I">■</span> Infield &nbsp;&nbsp; <span class="cnt-O">■</span> Outfield &nbsp;&nbsp; · = 0 times played</div>
+      <div style="margin-top:4px">Gms = games played / total games this season</div>
+      <div style="margin-top:4px">Target: no position more than 4× per player per season</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 5: SCHEDULE ═══════════════ -->
+<div class="screen" id="screen-schedule">
+
+  <!-- Season length card (moved from Roster) -->
+  <div class="card">
+    <div class="sec-title"><i class="ti ti-calendar" aria-hidden="true"></i> Season Length</div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <button class="game-count-btn" onclick="removeGame()" title="Remove last game">
+        <i class="ti ti-minus" aria-hidden="true"></i>
+      </button>
+      <div style="text-align:center">
+        <div id="gameCountDisplay" style="font-size:28px;font-weight:700;color:var(--purple);line-height:1">6</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">games</div>
+      </div>
+      <button class="game-count-btn" onclick="addGame()" title="Add a game">
+        <i class="ti ti-plus" aria-hidden="true"></i>
+      </button>
+      <div style="font-size:11px;color:var(--text2);line-height:1.5">
+        Rotation &amp; season summary<br>update automatically
+      </div>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text3)">
+      <i class="ti ti-lock" aria-hidden="true"></i> Games with scores or absences cannot be removed
+    </div>
+  </div>
+
+  <!-- Per-game schedule details -->
+  <div class="card">
+    <div class="sec-title"><i class="ti ti-list-details" aria-hidden="true"></i> Game Details</div>
+    <div id="scheduleList"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ BOTTOM TAB BAR ═══════════════ -->
+<nav class="tab-bar" role="tablist">
+  <button class="tab-bar-btn active" onclick="showScreen('roster',this)" role="tab">Roster</button>
+  <button class="tab-bar-btn" onclick="showScreen('schedule',this)" role="tab">Schedule</button>
+  <button class="tab-bar-btn" id="gameTabBtn" onclick="showScreen('game',this)" role="tab">Game<span class="absent-pip"></span></button>
+  <button class="tab-bar-btn" onclick="showScreen('tracker',this)" role="tab">Tracker</button>
+  <button class="tab-bar-btn" onclick="showScreen('summary',this)" role="tab">Summary</button>
+</nav>
+
+<script>
+// ── Constants ──────────────────────────────────────────────────────────────
+const IF_POSITIONS=['P','C','1B','2B','3B','SS'];
+const ALL_OF_SLOTS=['LF','CF','RF','OF1','OF2'];
+let GAMES=6;
+const INNINGS=5;
+const STORAGE_KEY='softball2026_scores';
+
+// Dynamic helpers based on roster size
+function getPositions(n){
+  const nOF=Math.min(3+Math.max(0,n-9),5);
+  return [...IF_POSITIONS,...ALL_OF_SLOTS.slice(0,nOF)];
+}
+function getOFPositions(n){ return getPositions(n).slice(6); }
+function benchPerInning(n){ return Math.max(0,n-11); }
+function posClass(pos){
+  if(IF_POSITIONS.includes(pos)) return 'I';
+  if(pos==='BN') return 'B';
+  return 'O';
+}
+
+// ── State ──────────────────────────────────────────────────────────────────
+function loadPlayers(){
+  try{ const r=localStorage.getItem('softball2026_players'); if(r){ const p=JSON.parse(r); if(Array.isArray(p)&&p.length>=9) return p; } }catch(e){}
+  return ['Abigail','Amelia','Aspen','Blake','Cali','Eva','Grace','Maggie','Olive','','',''];
+}
+function savePlayers(){ try{ localStorage.setItem('softball2026_players',JSON.stringify(players)); }catch(e){} }
+let players=loadPlayers();
+function loadAbsentMap(){
+  try{
+    const r=localStorage.getItem('softball2026_absent');
+    if(r){
+      const raw=JSON.parse(r);
+      // Convert plain arrays back to Sets keyed by game index
+      const map={};
+      Object.entries(raw).forEach(([g,arr])=>{ map[g]=new Set(arr); });
+      return map;
+    }
+  }catch(e){ console.warn('Absent load error',e); }
+  return {};
+}
+function saveAbsentMap(){
+  try{
+    // Convert Sets to plain arrays for JSON serialization
+    const raw={};
+    Object.entries(absentMap).forEach(([g,set])=>{
+      if(set.size>0) raw[g]=[...set];
+    });
+    localStorage.setItem('softball2026_absent',JSON.stringify(raw));
+  }catch(e){ console.error('Absent save error',e); }
+}
+let absentMap=loadAbsentMap();
+let currentGame=0, trackerGame=0, currentScreen='roster';
+let scores=loadScores();
+let scheduleData=loadScheduleData();
+let jerseyNumbers=loadJerseyNumbers(); // array indexed by player slot 0-11
+
+const SETTINGS_KEY='softball2026_settings';
+const SCHEDULE_KEY='softball2026_schedule';
+
+function loadJerseyNumbers(){
+  try{
+    const r=localStorage.getItem('softball2026_jerseys');
+    if(r){
+      const parsed=JSON.parse(r);
+      // ensure it's an array of 12
+      const arr=Array.isArray(parsed)?parsed:Array(12).fill('');
+      while(arr.length<12) arr.push('');
+      return arr;
+    }
+  }catch(e){ console.warn('Jersey load error',e); }
+  return Array(12).fill('');
+}
+function saveJerseyNumbers(){
+  try{
+    localStorage.setItem('softball2026_jerseys',JSON.stringify(jerseyNumbers));
+    // verify it saved
+    const check=localStorage.getItem('softball2026_jerseys');
+    if(!check) console.warn('[Jersey] Save failed silently');
+  }catch(e){ console.error('[Jersey] Save error',e); }
+}
+
+function loadScheduleData(){
+  try{ const r=localStorage.getItem(SCHEDULE_KEY); if(r) return JSON.parse(r); }catch(e){}
+  return {};
+}
+function saveScheduleData(){
+  try{ localStorage.setItem(SCHEDULE_KEY,JSON.stringify(scheduleData)); }catch(e){}
+}
+
+function loadSettings(){
+  try{ const r=localStorage.getItem(SETTINGS_KEY); if(r){ const s=JSON.parse(r); if(s.games) GAMES=s.games; } }catch(e){}
+}
+function saveSettings(){
+  try{ localStorage.setItem(SETTINGS_KEY,JSON.stringify({games:GAMES})); }catch(e){}
+}
+function loadScores(){
+  try{ const r=localStorage.getItem(STORAGE_KEY); if(r) return JSON.parse(r); }catch(e){}
+  return Array.from({length:GAMES},()=>[[...Array(INNINGS).fill(null)],[...Array(INNINGS).fill(null)]]);
+}
+function saveScores(){ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(scores));}catch(e){} }
+
+// Ensure scores array is always at least GAMES long
+function ensureScoresLength(){
+  while(scores.length<GAMES)
+    scores.push([[...Array(INNINGS).fill(null)],[...Array(INNINGS).fill(null)]]);
+}
+
+function gameHasData(g){
+  if(!scores[g]) return false;
+  const hasScore=scores[g][0].some(v=>v!==null)||scores[g][1].some(v=>v!==null);
+  const hasAbsent=getAbsent(g).size>0;
+  return hasScore||hasAbsent;
+}
+
+function addGame(){
+  GAMES++;
+  ensureScoresLength();
+  saveSettings();
+  if(currentGame>=GAMES) currentGame=GAMES-1;
+  if(trackerGame>=GAMES) trackerGame=GAMES-1;
+  renderAll();
+}
+
+function removeGame(){
+  if(GAMES<=1) return;
+  // Block if last game has data
+  if(gameHasData(GAMES-1)){
+    alert('Cannot remove Game '+GAMES+' — it has scores or absences recorded. Clear those first.');
+    return;
+  }
+  if(currentGame>=GAMES-1) currentGame=GAMES-2;
+  if(trackerGame>=GAMES-1) trackerGame=GAMES-2;
+  GAMES--;
+  saveSettings();
+  renderAll();
+}
+
+// ── Screen nav ─────────────────────────────────────────────────────────────
+const SCREEN_LABELS={roster:'Roster',game:'Game Details',tracker:'Inning Tracker',summary:'Season Summary',schedule:'Schedule'};
+function showScreen(name,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-bar-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  btn.classList.add('active');
+  currentScreen=name;
+  document.getElementById('headerSub').textContent=SCREEN_LABELS[name];
+  renderAll();
+}
+
+// ── Absence helpers ────────────────────────────────────────────────────────
+function getAbsent(g){ return absentMap[g]||new Set(); }
+function toggleAbsent(g,p){
+  if(!absentMap[g]) absentMap[g]=new Set();
+  absentMap[g].has(p)?absentMap[g].delete(p):absentMap[g].add(p);
+  // Clean up empty sets so storage stays tidy
+  if(absentMap[g].size===0) delete absentMap[g];
+  saveAbsentMap();
+}
+
+// ── Best joint assignment ──────────────────────────────────────────────────
+function bestAssignment(playerList,posList,posCount){
+  const pl=playerList.slice(), pos=posList.slice(0,pl.length);
+  if(!pl.length||!pos.length) return {};
+  function* perms(arr){
+    if(arr.length<=1){yield arr.slice();return;}
+    for(let i=0;i<arr.length;i++){
+      const rest=arr.filter((_,j)=>j!==i);
+      for(const p of perms(rest)) yield [arr[i],...p];
+    }
+  }
+  let best=null, bestScore=999999;
+  for(const perm of perms([...Array(pl.length).keys()])){
+    let score=0;
+    for(let i=0;i<pos.length;i++){
+      const p=pl[perm[i]];
+      score=Math.max(score,(posCount[p]&&posCount[p][pos[i]]?posCount[p][pos[i]]:0)+1);
+    }
+    if(score<bestScore){
+      bestScore=score; best={};
+      pos.forEach((p,i)=>best[p]=pl[perm[i]]);
+    }
+  }
+  return best||{};
+}
+
+// ── Bench schedule ─────────────────────────────────────────────────────────
+// bpi = bench players per inning (0 for n<=11, 1 for n=12)
+function buildBenchSchedule(present, bpi){
+  if(bpi===0) return Array.from({length:GAMES},()=>Array(INNINGS).fill([]));
+  const n=present.length;
+  const benchCounts={};present.forEach(p=>benchCounts[p]=0);
+  return Array.from({length:GAMES},(_,g)=>
+    Array.from({length:INNINGS},(_,inn)=>{
+      // pick bpi players with lowest bench count; use offset for variety
+      const sorted=[...present].sort((a,b)=>
+        benchCounts[a]!==benchCounts[b]
+          ? benchCounts[a]-benchCounts[b]
+          : (present.indexOf(a)+(g*INNINGS+inn))%n - (present.indexOf(b)+(g*INNINGS+inn))%n
+      );
+      const benched=sorted.slice(0,bpi);
+      benched.forEach(p=>benchCounts[p]++);
+      return benched;
+    })
+  );
+}
+
+// ── OF schedule ───────────────────────────────────────────────────────────
+// Assigns which innings each player is in OF vs IF.
+// Exact counts per game:
+//   n=9:  6 players get 2 OF, 3 get 1 OF  (15 total OF slots = 3*5)
+//   n=10: all 10 players get exactly 2 OF  (20 total OF slots = 4*5)
+//   n=11: 3 players get 3 OF, 8 get 2 OF  (25 total OF slots = 5*5)
+//   n=12: same as n=11 for 11 active (bench player skips via benchSchedule)
+// No consecutive OF innings enforced.
+function buildOFSchedule(present, benchSchedule){
+  const n=present.length;
+  const nOF=getOFPositions(n).length;
+  const nActive=Math.min(n,11); // max 11 play per inning
+  const totalOF=nOF*INNINGS;
+  const lowOF=Math.floor(totalOF/nActive);
+  const highOF=lowOF+1;
+  const nHigh=totalOF - nActive*lowOF; // how many players get highOF this game
+  const validPairs=[[0,2],[0,3],[0,4],[1,3],[1,4],[2,4]];
+
+  const ofInnings=present.map(()=>Array.from({length:GAMES},()=>[]));
+
+  for(let g=0;g<GAMES;g++){
+    const inningOFCount=Array(INNINGS).fill(0);
+
+    // Rotate which players get the extra (high) OF inning each game
+    const highPlayers=new Set();
+    for(let k=0;k<nHigh;k++)
+      highPlayers.add(present[(g*nHigh+k)%n]);
+
+    // Assign OF innings to each player
+    // High-OF players first so inning slots fill evenly
+    const ordered=[...present.filter(p=>highPlayers.has(p)),
+                   ...present.filter(p=>!highPlayers.has(p))];
+
+    ordered.forEach(p=>{
+      const pi=present.indexOf(p);
+      const count=highPlayers.has(p)?highOF:lowOF;
+      const benched=inn=>benchSchedule[g][inn].includes(p);
+
+      if(count===0){ ofInnings[pi][g]=[]; return; }
+
+      if(count===1){
+        // pick least-loaded inning that isn't benched
+        let best=null,bs=999;
+        for(let di=0;di<INNINGS;di++){
+          const inn=(di+g*3+pi*2)%INNINGS;
+          if(!benched(inn)&&inningOFCount[inn]<nOF&&inningOFCount[inn]<bs){
+            bs=inningOFCount[inn]; best=inn;
+          }
+        }
+        if(best===null) best=[...Array(INNINGS).keys()].find(i=>!benched(i)&&inningOFCount[i]<nOF)??0;
+        ofInnings[pi][g]=[best];
+        inningOFCount[best]++;
+
+      } else if(count===2){
+        // pick non-consecutive pair with lowest combined load
+        let bpair=null,bs=999;
+        for(let i=0;i<validPairs.length;i++){
+          const pair=validPairs[(i+g*2+pi)%validPairs.length];
+          if(!benched(pair[0])&&!benched(pair[1])&&
+             inningOFCount[pair[0]]<nOF&&inningOFCount[pair[1]]<nOF){
+            const s=inningOFCount[pair[0]]+inningOFCount[pair[1]];
+            if(s<bs){bs=s;bpair=pair;}
+          }
+        }
+        // fallback: any non-consecutive pair still available
+        if(!bpair) bpair=validPairs.find(pair=>
+          !benched(pair[0])&&!benched(pair[1])&&
+          inningOFCount[pair[0]]<nOF&&inningOFCount[pair[1]]<nOF
+        );
+        // last resort: pick two innings with lowest count (prefer non-consecutive)
+        if(!bpair){
+          const avail=[...Array(INNINGS).keys()]
+            .filter(i=>!benched(i)&&inningOFCount[i]<nOF)
+            .sort((a,b)=>inningOFCount[a]-inningOFCount[b]);
+          // try to find a non-consecutive pair among least-loaded
+          let picked=null;
+          for(let ai=0;ai<avail.length&&!picked;ai++)
+            for(let bi=ai+1;bi<avail.length&&!picked;bi++)
+              if(Math.abs(avail[ai]-avail[bi])>1) picked=[avail[ai],avail[bi]];
+          bpair=picked||(avail.length>=2?[avail[0],avail[1]]:[0,2]);
+        }
+        ofInnings[pi][g]=bpair.slice();
+        inningOFCount[bpair[0]]++; inningOFCount[bpair[1]]++;
+
+      } else {
+        // 3 OF innings: pick spread out, no consecutive if possible
+        const assigned=[];
+        for(let k=0;k<count;k++){
+          let best2=null,bs2=999;
+          for(let di=0;di<INNINGS;di++){
+            const inn=(di+k*2)%INNINGS;
+            if(assigned.includes(inn)||benched(inn)||inningOFCount[inn]>=nOF) continue;
+            const consec=assigned.some(a=>Math.abs(inn-a)===1);
+            const s=inningOFCount[inn]+(consec?10:0);
+            if(s<bs2){bs2=s;best2=inn;}
+          }
+          if(best2===null)
+            best2=[...Array(INNINGS).keys()]
+              .find(i=>!assigned.includes(i)&&!benched(i)&&inningOFCount[i]<nOF)??0;
+          assigned.push(best2); inningOFCount[best2]++;
+        }
+        ofInnings[pi][g]=assigned;
+      }
+    });
+  }
+  return ofInnings;
+}
+
+// ── Build base rotation ────────────────────────────────────────────────────
+function buildBaseRotation(present){
+  const n=present.length;
+  if(n===0) return [];
+  const positions=getPositions(n);
+  const ofPositions=getOFPositions(n);
+  const bpi=benchPerInning(n);
+  const benchSchedule=buildBenchSchedule(present,bpi);
+  const ofInnings=buildOFSchedule(present,benchSchedule);
+
+  // posCount tracks cumulative position usage for balancing
+  const allTrackedPos=[...positions,...(bpi>0?['BN']:[])];
+  const posCount={};
+  present.forEach(p=>{posCount[p]={};allTrackedPos.forEach(pos=>posCount[p][pos]=0);});
+
+  const rot=[];
+  for(let g=0;g<GAMES;g++){
+    const gi=[];
+    for(let inn=0;inn<INNINGS;inn++){
+      const benched=benchSchedule[g][inn];
+      const active=present.filter(p=>!benched.includes(p));
+      const ofP=active.filter(p=>ofInnings[present.indexOf(p)][g].includes(inn));
+      const ifP=active.filter(p=>!ofInnings[present.indexOf(p)][g].includes(inn));
+      const asgn={};
+      // Bench
+      benched.forEach(p=>{ asgn['BN']=asgn['BN']?asgn['BN']+','+p:p; posCount[p]['BN']++; });
+      // OF — joint optimal across all OF slots
+      const ofA=bestAssignment(ofP,ofPositions,posCount);
+      Object.entries(ofA).forEach(([pos,p])=>{ asgn[pos]=p; posCount[p][pos]++; });
+      // IF — joint optimal across all IF slots
+      const ifA=bestAssignment(ifP,IF_POSITIONS.slice(0,ifP.length),posCount);
+      Object.entries(ifA).forEach(([pos,p])=>{ asgn[pos]=p; posCount[p][pos]++; });
+      gi.push(asgn);
+    }
+    rot.push(gi);
+  }
+  return rot;
+}
+
+// ── Apply absences ─────────────────────────────────────────────────────────
+function applyAbsences(baseGame, absentSet, n){
+  const innings=baseGame.map(inn=>Object.assign({},inn));
+  const ofPos=getOFPositions(n);
+  const allPos=[...IF_POSITIONS,...ofPos,...(benchPerInning(n)>0?['BN']:[])];
+  for(let inn=0;inn<INNINGS;inn++){
+    const asgn=innings[inn];
+    // Clear absent
+    for(const pos of allPos){ if(asgn[pos]&&absentSet.has(asgn[pos])) asgn[pos]=null; }
+    // Fill vacant infield from outfield (use core OF slots LF/CF/RF first)
+    for(const ifPos of IF_POSITIONS){
+      if(asgn[ifPos]) continue;
+      // Find OF player with most OF innings so far to move to IF
+      const cands=ofPos.filter(op=>asgn[op]!=null).map(op=>{
+        const p=asgn[op]; let c=0;
+        for(let prev=0;prev<=inn;prev++)
+          ofPos.forEach(op2=>{ if(innings[prev][op2]===p) c++; });
+        return{pos:op,player:p,ofCount:c};
+      });
+      if(!cands.length) continue;
+      cands.sort((a,b)=>b.ofCount-a.ofCount);
+      asgn[ifPos]=cands[0].player; asgn[cands[0].pos]=null;
+    }
+  }
+  return innings;
+}
+
+// ── Batting order ──────────────────────────────────────────────────────────
+function mulberry32(seed){
+  return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
+}
+function buildAllBatOrders(fullRoster){
+  const n=fullRoster.length;
+  if(n===0) return Array(GAMES).fill([]);
+  const rng=mulberry32(0xDEADBEEF);
+  function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  const pool=shuffle(fullRoster.slice());
+  const leadoffs=Array.from({length:GAMES},(_,g)=>pool[g%n]);
+  return Array.from({length:GAMES},(_,g)=>{const lo=leadoffs[g];return[lo,...shuffle(fullRoster.filter(p=>p!==lo))];});
+}
+function getBatOrder(present,gIdx,allOrders){
+  if(!present.length||!allOrders||!allOrders[gIdx]) return [];
+  return allOrders[gIdx].filter(p=>present.includes(p));
+}
+
+// ── Scoreboard ─────────────────────────────────────────────────────────────
+function renderScoreboard(){
+  const g=currentGame;
+  let h=`<tr><th class="team-header">Team</th>`;
+  for(let i=0;i<INNINGS;i++) h+=`<th>Inn ${i+1}</th>`;
+  h+=`<th class="total-header">Total</th></tr>`;
+  let ut=0,tt=0;
+  ['us','them'].forEach((team,ti)=>{
+    h+=`<tr><td class="team-label ${team}">${ti===0?'<i class="ti ti-trophy"></i> Our Team':'<i class="ti ti-users"></i> Opponent'}</td>`;
+    for(let i=0;i<INNINGS;i++){
+      const val=scores[g][ti][i];
+      if(val!==null) ti===0?ut+=val:tt+=val;
+      h+=`<td><input class="score-input" type="number" min="0" max="99" value="${val!==null?val:''}" placeholder="—" data-game="${g}" data-team="${ti}" data-inning="${i}" oninput="handleScore(this)"></td>`;
+    }
+    h+=`<td class="total-cell ${team}" id="${ti===0?'usTotal':'themTotal'}">${ti===0?ut:tt}</td></tr>`;
+  });
+  document.getElementById('scoreTable').innerHTML=h;
+  updateWinBanner(ut,tt);
+}
+function handleScore(input){
+  const g=+input.dataset.game,ti=+input.dataset.team,inn=+input.dataset.inning;
+  scores[g][ti][inn]=input.value.trim()===''?null:Math.max(0,parseInt(input.value)||0);
+  saveScores();
+  let ut=0,tt=0;
+  for(let i=0;i<INNINGS;i++){if(scores[g][0][i]!==null)ut+=scores[g][0][i];if(scores[g][1][i]!==null)tt+=scores[g][1][i];}
+  const ue=document.getElementById('usTotal'),te=document.getElementById('themTotal');
+  if(ue)ue.textContent=ut; if(te)te.textContent=tt;
+  updateWinBanner(ut,tt);
+}
+function updateWinBanner(us,them){
+  const b=document.getElementById('winBanner'); if(!b) return;
+  const any=scores[currentGame][0].some(v=>v!==null)||scores[currentGame][1].some(v=>v!==null);
+  if(!any){b.className='win-banner';b.textContent='';return;}
+  if(us>them){b.className='win-banner win';b.innerHTML=`<i class="ti ti-trophy"></i> Winning ${us}–${them}`;}
+  else if(them>us){b.className='win-banner loss';b.innerHTML=`<i class="ti ti-mood-sad"></i> Trailing ${us}–${them}`;}
+  else{b.className='win-banner tie';b.innerHTML=`<i class="ti ti-equal"></i> Tied ${us}–${them}`;}
+}
+
+// ── Render helpers ─────────────────────────────────────────────────────────
+let rosterDebounce=null;
+function renderRoster(){
+  const g=document.getElementById('rosterGrid'); g.innerHTML='';
+  const hints=['','','','','','','','','',
+    'Player 10 — adds OF1 slot','Player 11 — adds OF2 slot','Player 12 — bench rotation'];
+  for(let i=0;i<12;i++){
+    const d=document.createElement('div'); d.className='player-input';
+    d.innerHTML=`
+      <span class="pnum">${i+1}</span>
+      <input class="jersey-input" type="text" inputmode="numeric" maxlength="3"
+        placeholder="#" value="${jerseyNumbers[i]||''}" data-jidx="${i}"
+        title="Jersey number">
+      <input type="text" placeholder="${hints[i]||'Player name'}"
+        value="${players[i]||''}" data-idx="${i}" title="${hints[i]}">`;
+    g.appendChild(d);
+  }
+  // Name inputs
+  g.querySelectorAll('input[data-idx]').forEach(inp=>inp.addEventListener('input',e=>{
+    players[+e.target.dataset.idx]=e.target.value.trim();
+    savePlayers();
+    clearTimeout(rosterDebounce);
+    rosterDebounce=setTimeout(renderAll,400);
+  }));
+  // Jersey number inputs
+  g.querySelectorAll('input[data-jidx]').forEach(inp=>inp.addEventListener('input',e=>{
+    jerseyNumbers[+e.target.dataset.jidx]=e.target.value.trim();
+    saveSettings();
+  }));
+}
+
+function renderGamePills(containerId, activeGame, onClickFn){
+  const el=document.getElementById(containerId); el.innerHTML='';
+  for(let i=0;i<GAMES;i++){
+    const hasAbs=getAbsent(i).size>0;
+    const b=document.createElement('button');
+    b.className='game-pill'+(i===activeGame?' active':'')+(hasAbs?' has-absent':'');
+    b.innerHTML=`Game ${i+1}<span class="absent-dot"></span>`;
+    b.onclick=()=>onClickFn(i);
+    el.appendChild(b);
+  }
+}
+
+function renderAbsent(fullRoster){
+  const el=document.getElementById('absentGrid'); el.innerHTML='';
+  const note=document.getElementById('absentNote');
+  const absent=getAbsent(currentGame);
+  fullRoster.forEach(p=>{
+    const b=document.createElement('button');
+    b.className='absent-btn'+(absent.has(p)?' out':'');
+    b.textContent=absent.has(p)?`${p} (absent)`:p;
+    b.onclick=()=>{ toggleAbsent(currentGame,p); renderAll(); };
+    el.appendChild(b);
+  });
+  note.innerHTML=absent.size>0?`<div class="absent-note"><i class="ti ti-info-circle"></i> Absence applies to Game ${currentGame+1} only.</div>`:'';
+}
+
+function renderField(gameInnings, n){
+  const positions=getPositions(n);
+  const bpi=benchPerInning(n);
+  const displayPos=[...positions,...(bpi>0?['BN']:[])];
+  let h='<tr><th>Pos</th>';
+  for(let i=0;i<INNINGS;i++) h+=`<th>Inn ${i+1}</th>`;
+  h+='</tr>';
+  displayPos.forEach(pos=>{
+    const cat=posClass(pos);
+    h+=`<tr><td><span class="pos-pill pos-${cat}">${pos}</span></td>`;
+    for(let i=0;i<INNINGS;i++){
+      const val=gameInnings[i]?gameInnings[i][pos]:null;
+      h+=`<td>${val||'<span class="cell-vacant">—</span>'}</td>`;
+    }
+    h+='</tr>';
+  });
+  document.getElementById('fieldTable').innerHTML=h;
+}
+
+function renderBatting(fullRoster, allOrders){
+  const absent=getAbsent(currentGame);
+  const here=fullRoster.filter(p=>!absent.has(p));
+  const order=getBatOrder(here,currentGame,allOrders);
+  const list=document.getElementById('batList'); list.innerHTML='';
+  order.forEach((p,i)=>{
+    const playerIdx=players.indexOf(p);
+    const jersey=playerIdx>=0&&jerseyNumbers[playerIdx]?jerseyNumbers[playerIdx]:'';
+    const li=document.createElement('li');
+    li.innerHTML=`<span class="bat-num">${i+1}</span>`+
+      (jersey?`<span class="bat-jersey">#${jersey}</span>`:'')+
+      `<span class="bat-name">${p}</span>`;
+    list.appendChild(li);
+  });
+}
+
+function renderTracker(baseRot, fullRoster, g){
+  const absent=getAbsent(g);
+  const n=fullRoster.length;
+  const gameInnings=baseRot[g]?applyAbsences(baseRot[g],absent,n):[];
+  const ofPositions=getOFPositions(n);
+  document.getElementById('trackerGameLabel').textContent=`Game ${g+1}`;
+  let h='';
+  fullRoster.forEach(p=>{
+    const isAbs=absent.has(p);
+    let oC=0; const dots=[];
+    if(isAbs){
+      for(let inn=0;inn<INNINGS;inn++) dots.push(`<div class="dot dot-X">✕</div>`);
+    } else {
+      for(let inn=0;inn<INNINGS;inn++){
+        const asgn=gameInnings[inn]||{};
+        const pos=Object.keys(asgn).find(k=>asgn[k]===p)||null;
+        const cat=pos?posClass(pos):'B';
+        if(cat==='O') oC++;
+        const label=pos==='BN'?'BN':cat;
+        dots.push(`<div class="dot dot-${cat}">${label}</div>`);
+      }
+    }
+    const badge=isAbs
+      ?`<span class="of-badge of-abs">absent</span>`
+      :`<span class="of-badge ${oC>=2?'of-2':'of-1'}">${oC} OF</span>`;
+    h+=`<div class="tracker-row${isAbs?' absent-row':''}">
+      <span style="font-weight:500;min-width:64px;font-size:13px">${p}</span>
+      <div class="dots">${dots.join('')}</div>${badge}
+    </div>`;
+  });
+  document.getElementById('trackerDiv').innerHTML=h||'<p style="font-size:12px;color:var(--text3)">No players</p>';
+}
+
+function renderSummary(baseRot, fullRoster){
+  const n=fullRoster.length;
+  if(!n){document.getElementById('summaryTable').innerHTML='';return;}
+  const positions=getPositions(n);
+  const bpi=benchPerInning(n);
+  const displayPos=[...positions,...(bpi>0?['BN']:[])];
+  const posCounts={}, totals={}, gamesPlayed={};
+  fullRoster.forEach(p=>{
+    posCounts[p]={}; displayPos.forEach(pos=>posCounts[p][pos]=0);
+    totals[p]={I:0,O:0,BN:0}; gamesPlayed[p]=0;
+  });
+  for(let g=0;g<GAMES;g++){
+    if(!baseRot[g]) continue;
+    const absentG=getAbsent(g);
+    const adjusted=applyAbsences(baseRot[g],absentG,n);
+    fullRoster.forEach(p=>{
+      if(absentG.has(p)) return;
+      gamesPlayed[p]++;
+      for(let inn=0;inn<INNINGS;inn++){
+        const asgn=adjusted[inn]||{};
+        const pos=Object.keys(asgn).find(k=>asgn[k]===p||
+          (Array.isArray(asgn[k])&&asgn[k].includes(p)))||null;
+        if(pos){
+          posCounts[p][pos]=(posCounts[p][pos]||0)+1;
+          const cat=posClass(pos);
+          if(cat==='I') totals[p].I++;
+          else if(cat==='O') totals[p].O++;
+          else totals[p].BN++;
+        }
+      }
+    });
+  }
+  let h=`<tr><th>Player</th>${displayPos.map(p=>`<th>${p}</th>`).join('')}<th>I</th><th>O</th>${bpi>0?'<th>BN</th>':''}<th>Gms</th></tr>`;
+  fullRoster.forEach(p=>{
+    h+=`<tr><td>${p}</td>`;
+    displayPos.forEach(pos=>{
+      const v=posCounts[p][pos]||0;
+      const cls=posClass(pos)==='I'?'cnt-I':posClass(pos)==='O'?'cnt-O':'';
+      h+=`<td class="${cls}">${v||'·'}</td>`;
+    });
+    h+=`<td class="cnt-I">${totals[p].I}</td><td class="cnt-O">${totals[p].O}</td>`;
+    if(bpi>0) h+=`<td>${totals[p].BN}</td>`;
+    h+=`<td style="color:var(--text3);font-size:11px">${gamesPlayed[p]}/${GAMES}</td></tr>`;
+  });
+  document.getElementById('summaryTable').innerHTML=h;
+}
+
+// ── Schedule screen ───────────────────────────────────────────────────────
+function renderSchedule(){
+  const el=document.getElementById('scheduleList');
+  if(!el) return;
+  let h='';
+  for(let g=0;g<GAMES;g++){
+    const d=scheduleData[g]||{};
+    h+=`<div class="schedule-game-card">
+      <div class="schedule-game-header">
+        <span class="schedule-game-num">Game ${g+1}</span>
+        ${d.date?`<span class="schedule-date">${d.date}</span>`:''}
+        ${d.time?`<span class="schedule-time-badge">${formatTime12(d.time)}</span>`:''}
+        ${d.homeaway?`<span class="schedule-ha schedule-ha-${d.homeaway}">${d.homeaway==='home'?'Home':'Away'}</span>`:''}
+      </div>
+      <div class="schedule-fields">
+        <div class="schedule-field-row">
+          <label>Date</label>
+          <input type="date" class="schedule-input" value="${d.date||''}"
+            data-game="${g}" data-field="date" onchange="handleSchedule(this)">
+        </div>
+        <div class="schedule-field-row">
+          <label>Time</label>
+          <input type="time" class="schedule-input" value="${d.time||''}"
+            data-game="${g}" data-field="time"
+            onblur="handleSchedule(this)" onchange="handleSchedule(this)">
+          <span class="schedule-time-display" id="timeDisplay${g}">${d.time?formatTime12(d.time):''}</span>
+        </div>
+        <div class="schedule-field-row">
+          <label>Opponent</label>
+          <input type="text" class="schedule-input" placeholder="Team name"
+            value="${d.opponent||''}" data-game="${g}" data-field="opponent"
+            oninput="handleScheduleInput(this)" onblur="handleSchedule(this)">
+        </div>
+        <div class="schedule-field-row">
+          <label>Home / Away</label>
+          <div class="ha-toggle">
+            <button class="ha-btn${d.homeaway==='home'?' active':''}"
+              data-game="${g}" data-val="home" onclick="handleHAToggle(this)">Home</button>
+            <button class="ha-btn${d.homeaway==='away'?' active':''}"
+              data-game="${g}" data-val="away" onclick="handleHAToggle(this)">Away</button>
+          </div>
+        </div>
+        <div class="schedule-field-row">
+          <label>Field #</label>
+          <input type="text" class="schedule-input schedule-input-sm" placeholder="e.g. 3"
+            value="${d.field||''}" data-game="${g}" data-field="field"
+            oninput="handleScheduleInput(this)" onblur="handleSchedule(this)">
+        </div>
+      </div>
+    </div>`;
+  }
+  el.innerHTML=h;
+}
+
+// Convert 24hr time value to 12hr display
+function formatTime12(val){
+  if(!val) return '';
+  const [h,m]=val.split(':').map(Number);
+  const ampm=h>=12?'PM':'AM';
+  const h12=h%12||12;
+  return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+
+function handleScheduleInput(input){
+  // Save value on every keystroke but DON'T re-render (keeps cursor in place)
+  const g=+input.dataset.game, field=input.dataset.field;
+  if(!scheduleData[g]) scheduleData[g]={};
+  scheduleData[g][field]=input.value;
+  saveScheduleData();
+}
+
+function handleSchedule(input){
+  const g=+input.dataset.game, field=input.dataset.field;
+  if(!scheduleData[g]) scheduleData[g]={};
+  scheduleData[g][field]=input.value.trim();
+  saveScheduleData();
+  // Only re-render on blur (not on change mid-picker) to avoid closing iOS picker
+  if(document.activeElement!==input){
+    renderSchedule();
+  } else {
+    // Just update the header badge without full re-render
+    const header=input.closest('.schedule-game-card')?.querySelector('.schedule-game-header');
+    if(header){
+      const d=scheduleData[g]||{};
+      const dateBadge=header.querySelector('.schedule-date');
+      const timeBadge=header.querySelector('.schedule-time-badge');
+      if(dateBadge) dateBadge.textContent=d.date||'';
+      if(timeBadge) timeBadge.textContent=d.time?formatTime12(d.time):'';
+    }
+  }
+}
+
+function handleHAToggle(btn){
+  const g=+btn.dataset.game, val=btn.dataset.val;
+  if(!scheduleData[g]) scheduleData[g]={};
+  // Toggle off if already selected
+  if(scheduleData[g].homeaway===val){
+    scheduleData[g].homeaway='';
+  } else {
+    scheduleData[g].homeaway=val;
+  }
+  saveScheduleData();
+  renderSchedule();
+}
+
+// ── Master render ──────────────────────────────────────────────────────────
+function renderAll(){
+  const fullRoster=players.filter((p,i)=>p&&i<12);
+  const n=fullRoster.length;
+  const baseRot=buildBaseRotation(fullRoster);
+  const allOrders=buildAllBatOrders(fullRoster);
+  const absent=getAbsent(currentGame);
+  const gameInnings=baseRot[currentGame]?applyAbsences(baseRot[currentGame],absent,n):[];
+
+  // Tab pip
+  const gtb=document.getElementById('gameTabBtn');
+  if(gtb) gtb.classList.toggle('has-absent',getAbsent(currentGame).size>0);
+
+  // Warn vacant infield
+  const vacantIF=gameInnings.some(inn=>IF_POSITIONS.some(p=>!inn[p]));
+  const wb=document.getElementById('warnBox');
+  if(wb) wb.innerHTML=vacantIF?`<div class="warn"><i class="ti ti-alert-triangle"></i> Too many absent — some infield spots cannot be filled.</div>`:'';
+
+  ensureScoresLength();
+  // Update game count display
+  const gcd=document.getElementById('gameCountDisplay');
+  if(gcd) gcd.textContent=GAMES;
+  renderGamePills('gamePills',currentGame,i=>{currentGame=i;renderAll();});
+  renderGamePills('trackerPills',trackerGame,i=>{trackerGame=i;renderAll();});
+
+  renderAbsent(fullRoster);
+  document.getElementById('detailsTitle').textContent=`Game ${currentGame+1} Details`;
+  document.getElementById('printFooter').textContent=`Game ${currentGame+1} · 2026 Season · ${new Date().toLocaleDateString()}`;
+  renderField(gameInnings,n);
+  renderBatting(fullRoster,allOrders);
+  renderScoreboard();
+  renderTracker(baseRot,fullRoster,trackerGame);
+  renderSummary(baseRot,fullRoster);
+  renderSchedule();
+}
+
+// ── Copy lineup ────────────────────────────────────────────────────────────
+function copyLineup(){
+  const fullRoster=players.filter((p,i)=>p&&i<12);
+  const n=fullRoster.length;
+  const baseRot=buildBaseRotation(fullRoster);
+  const allOrders=buildAllBatOrders(fullRoster);
+  const absent=getAbsent(currentGame);
+  const gameInnings=baseRot[currentGame]?applyAbsences(baseRot[currentGame],absent,n):[];
+  const here=fullRoster.filter(p=>!absent.has(p));
+  const order=getBatOrder(here,currentGame,allOrders);
+  const positions=[...getPositions(n),...(benchPerInning(n)>0?['BN']:[])];
+  let txt=`Game ${currentGame+1} Lineup\n${'='.repeat(28)}\n`;
+  if(absent.size) txt+=`Absent: ${[...absent].join(', ')}\n`;
+  txt+=`\nBATTING ORDER\n`;
+  order.forEach((p,i)=>{txt+=`${i+1}. ${p}\n`;});
+  txt+=`\nFIELD POSITIONS\nPOS\t`+Array.from({length:INNINGS},(_,i)=>`Inn${i+1}`).join('\t')+'\n';
+  positions.forEach(pos=>{
+    txt+=pos+'\t'+Array.from({length:INNINGS},(_,i)=>gameInnings[i]?gameInnings[i][pos]||'—':'—').join('\t')+'\n';
+  });
+  const g=currentGame;
+  const ut=scores[g][0].reduce((a,v)=>a+(v||0),0);
+  const tt=scores[g][1].reduce((a,v)=>a+(v||0),0);
+  txt+=`\nSCORE\nOur Team\t${scores[g][0].map(v=>v!==null?v:'—').join('\t')}\t${ut}\n`;
+  txt+=`Opponent\t${scores[g][1].map(v=>v!==null?v:'—').join('\t')}\t${tt}\n`;
+  navigator.clipboard&&navigator.clipboard.writeText(txt)
+    .then(()=>alert('Lineup copied!')).catch(()=>alert('Copy failed'));
+}
+
+loadSettings();
+renderRoster();
+renderAll();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(r=>console.log('SW registered'))
+      .catch(e=>console.log('SW registration failed',e));
+  });
+}
+</script>
+</body>
+</html>
